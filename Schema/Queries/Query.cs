@@ -1,7 +1,6 @@
 using Bogus;
-using GraphQL.Types;
 
-namespace GraphQL.API.Types;
+namespace GraphQL.API.Schema.Queries;
 
 [QueryType]
 public class Query

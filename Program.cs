@@ -1,6 +1,10 @@
+using GraphQL.API.Schema.Mutations;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddGraphQL().AddTypes();
+builder.AddGraphQL()
+    .AddTypes()
+    .AddMutationType<Mutation>();
 
 builder.Services.AddCors((options) =>
 {
