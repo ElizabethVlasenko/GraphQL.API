@@ -1,10 +1,14 @@
 using GraphQL.API.Schema.Mutations;
+using GraphQL.API.Schema.Subscriptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddGraphQL()
     .AddTypes()
-    .AddMutationType<Mutation>();
+    .AddMutationType<Mutation>()
+    .AddSubscriptionType<Subscription>()
+    .AddInMemorySubscriptions(); ;
+
 
 builder.Services.AddCors((options) =>
 {
@@ -36,6 +40,7 @@ else
     app.UseHttpsRedirection();
 }
 
+app.UseWebSockets();
 
 app.MapGraphQL();
 
