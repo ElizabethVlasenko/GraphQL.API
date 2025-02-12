@@ -1,5 +1,7 @@
 using GraphQL.API.Schema.Mutations;
 using GraphQL.API.Schema.Subscriptions;
+using GraphQL.API.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,8 @@ builder.AddGraphQL()
     .AddSubscriptionType<Subscription>()
     .AddInMemorySubscriptions(); ;
 
+string connectionString = builder.Configuration.GetConnectionString("default");
+builder.Services.AddPooledDbContextFactory<SchoolDBContext>(o => o.UseSqlite(connectionString));
 
 builder.Services.AddCors((options) =>
 {
@@ -28,7 +32,19 @@ builder.Services.AddCors((options) =>
     });
 });
 
+builder.Services.AddTransient<SchoolDBContext>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SchoolDBContext>>();
+    using (var context = dbContextFactory.CreateDbContext())
+    {
+        context.Database.Migrate();
+    }
+}
+
 
 if (app.Environment.IsDevelopment())
 {

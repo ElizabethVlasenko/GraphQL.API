@@ -1,11 +1,8 @@
-﻿namespace GraphQL.API.Schema.Queries
+﻿using GraphQL.API.Models;
+
+namespace GraphQL.API.Schema.Queries
 {
-    public enum Subject
-    {
-        Mathematics,
-        Science,
-        History
-    }
+
     public class CourseType
     {
         public Guid Id { get; set; }
