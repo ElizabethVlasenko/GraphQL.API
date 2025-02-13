@@ -1,28 +1,30 @@
-﻿using GraphQL.API.Schema.Subscriptions;
+﻿using AutoMapper;
+using GraphQL.API.DTOs;
+using GraphQL.API.Schema.Subscriptions;
+using GraphQL.API.Services.Courses;
 using HotChocolate.Subscriptions;
 
 namespace GraphQL.API.Schema.Mutations
 {
     public class Mutation
     {
-        private readonly List<CourseResult> _courses;
+        private readonly CoursesRepository _coursesRepository;
+        private readonly IMapper _mapper;
 
-        public Mutation()
+        public Mutation(CoursesRepository coursesRepository, IMapper mapper)
         {
-            _courses = new List<CourseResult>();
+            _coursesRepository = coursesRepository;
+            _mapper = mapper;
         }
 
         public async Task<CourseResult> CreateCourse(CourseInputType courseInput, [Service] ITopicEventSender topicEventSender)
         {
-            CourseResult course = new CourseResult()
-            {
-                Id = Guid.NewGuid(),
-                Name = courseInput.Name,
-                Subject = courseInput.Subject,
-                instructorId = courseInput.InstructorId
-            };
+            CourseDTO courseDTO = _mapper.Map<CourseDTO>(courseInput);
 
-            _courses.Add(course);
+            courseDTO = await _coursesRepository.Create(courseDTO);
+
+            CourseResult course = _mapper.Map<CourseResult>(courseDTO);
+
             await topicEventSender.SendAsync(nameof(Subscription.CourseCreated), course);
 
             return course;
@@ -30,17 +32,14 @@ namespace GraphQL.API.Schema.Mutations
 
         public async Task<CourseResult> UpdateCourse(Guid id, CourseInputType courseInput, [Service] ITopicEventSender topicEventSender)
         {
-            CourseResult course = _courses.FirstOrDefault(c => c.Id == id);
 
-            if (course == null)
-            {
-                throw new GraphQLException(new Error("Course not found", "COURSE_NOT_FOUND"));
-                throw new Exception("Course not found");
-            }
+            CourseDTO courseDTO = _mapper.Map<CourseDTO>(courseInput);
 
-            course.Name = courseInput.Name;
-            course.Subject = courseInput.Subject;
-            course.instructorId = courseInput.InstructorId;
+            courseDTO.Id = id;
+
+            courseDTO = await _coursesRepository.Update(courseDTO);
+
+            CourseResult course = _mapper.Map<CourseResult>(courseDTO);
 
             string updateCourseTopic = $"{course.Id}_{nameof(Subscription.CourseUpdated)}";
             await topicEventSender.SendAsync(updateCourseTopic, course);
@@ -48,9 +47,17 @@ namespace GraphQL.API.Schema.Mutations
             return course;
         }
 
-        public bool DeleteCourse(Guid id)
+        public async Task<bool> DeleteCourse(Guid id)
         {
-            return _courses.RemoveAll(c => c.Id == id) >= 1;
+            try
+            {
+                return await _coursesRepository.Delete(id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
         }
     }
 }

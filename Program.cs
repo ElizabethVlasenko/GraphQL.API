@@ -1,6 +1,8 @@
+using GraphQL.API.MapperProfiles;
 using GraphQL.API.Schema.Mutations;
 using GraphQL.API.Schema.Subscriptions;
 using GraphQL.API.Services;
+using GraphQL.API.Services.Courses;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,8 @@ builder.AddGraphQL()
 
 string connectionString = builder.Configuration.GetConnectionString("default");
 builder.Services.AddPooledDbContextFactory<SchoolDBContext>(o => o.UseSqlite(connectionString));
+
+builder.Services.AddScoped<CoursesRepository>();
 
 builder.Services.AddCors((options) =>
 {
@@ -33,6 +37,7 @@ builder.Services.AddCors((options) =>
 });
 
 builder.Services.AddTransient<SchoolDBContext>();
+builder.Services.AddAutoMapper(typeof(CourseProfile));
 
 var app = builder.Build();
 
