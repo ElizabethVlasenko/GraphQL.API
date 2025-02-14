@@ -1,4 +1,7 @@
-﻿using GraphQL.API.Models;
+﻿using AutoMapper;
+using GraphQL.API.DataLoaders;
+using GraphQL.API.DTOs;
+using GraphQL.API.Models;
 
 namespace GraphQL.API.Schema.Queries
 {
@@ -8,8 +11,15 @@ namespace GraphQL.API.Schema.Queries
         public Guid Id { get; set; }
         public string Name { get; set; } = "";
         public Subject Subject { get; set; }
+        public Guid InstructorId { get; set; }
         [GraphQLNonNullType]
-        public InstructorType Instructor { get; set; }
+        public async Task<InstructorType> Instructor(InstructorDataLoader instructorDataLoader,
+            IMapper mapper)
+        {
+            InstructorDTO instructorDTO = await instructorDataLoader
+                .LoadAsync(InstructorId, CancellationToken.None);
+            return mapper.Map<InstructorType>(instructorDTO);
+        }
         public IEnumerable<StudentType> Students { get; set; }
 
         public string Description()

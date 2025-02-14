@@ -12,7 +12,7 @@
             CreateMap<CourseDTO, CourseResult>().ReverseMap();
             CreateMap<CourseInputType, CourseDTO>().ReverseMap();
             CreateMap<CourseDTO, CourseType>()
-                .ForMember(d => d.Instructor, opt => opt.MapFrom(src => src.Instructor))
+                //.ForMember(d => d.Instructor, opt => opt.MapFrom(src => src.Instructor))
                 .ReverseMap();
 
         }

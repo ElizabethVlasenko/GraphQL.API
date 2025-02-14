@@ -1,8 +1,10 @@
+using GraphQL.API.DataLoaders;
 using GraphQL.API.MapperProfiles;
 using GraphQL.API.Schema.Mutations;
 using GraphQL.API.Schema.Subscriptions;
 using GraphQL.API.Services;
 using GraphQL.API.Services.Courses;
+using GraphQL.API.Services.Instructors;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,8 @@ string connectionString = builder.Configuration.GetConnectionString("default");
 builder.Services.AddPooledDbContextFactory<SchoolDBContext>(o => o.UseSqlite(connectionString));
 
 builder.Services.AddScoped<CoursesRepository>();
+builder.Services.AddScoped<InstructorsRepository>();
+builder.Services.AddScoped<InstructorDataLoader>();
 
 builder.Services.AddCors((options) =>
 {
@@ -37,7 +41,9 @@ builder.Services.AddCors((options) =>
 });
 
 builder.Services.AddTransient<SchoolDBContext>();
+
 builder.Services.AddAutoMapper(typeof(CourseProfile));
+builder.Services.AddAutoMapper(typeof(InstructorProfile));
 
 var app = builder.Build();
 
