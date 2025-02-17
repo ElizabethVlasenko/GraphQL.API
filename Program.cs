@@ -13,7 +13,7 @@ builder.AddGraphQL()
     .AddTypes()
     .AddMutationType<Mutation>()
     .AddSubscriptionType<Subscription>()
-    .AddInMemorySubscriptions(); ;
+    .AddInMemorySubscriptions();
 
 string connectionString = builder.Configuration.GetConnectionString("default");
 builder.Services.AddPooledDbContextFactory<SchoolDBContext>(o => o.UseSqlite(connectionString));
