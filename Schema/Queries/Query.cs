@@ -1,6 +1,7 @@
 using AutoMapper;
 using GraphQL.API.DTOs;
 using GraphQL.API.Schema.Filters;
+using GraphQL.API.Schema.Sorters;
 using GraphQL.API.Services;
 using GraphQL.API.Services.Courses;
 
@@ -27,6 +28,7 @@ public class Query
 
     [UsePaging(IncludeTotalCount = true, DefaultPageSize = 10)]
     [UseFiltering(typeof(CourseFilterType))]
+    [UseSorting(typeof(CourseSortType))]
     public IQueryable<CourseType> GetPaginatingCourse(SchoolDBContext context)
     {
         return context.Courses.Select(c => new CourseType()
