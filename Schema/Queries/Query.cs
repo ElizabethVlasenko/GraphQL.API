@@ -1,5 +1,6 @@
 using AutoMapper;
 using GraphQL.API.DTOs;
+using GraphQL.API.Schema.Filters;
 using GraphQL.API.Services;
 using GraphQL.API.Services.Courses;
 
@@ -16,7 +17,6 @@ public class Query
         _mapper = mapper;
     }
 
-
     public async Task<IEnumerable<CourseType>> GetCourse()
     {
         IEnumerable<CourseDTO> courseDTOList = await _coursesRepository.GetAll();
@@ -26,11 +26,16 @@ public class Query
     }
 
     [UsePaging(IncludeTotalCount = true, DefaultPageSize = 10)]
+    [UseFiltering(typeof(CourseFilterType))]
     public IQueryable<CourseType> GetPaginatingCourse(SchoolDBContext context)
     {
-        IQueryable<CourseType> courses = context.Courses.Select(c => _mapper.Map<CourseType>(c));
-
-        return courses;
+        return context.Courses.Select(c => new CourseType()
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Subject = c.Subject,
+            InstructorId = c.InstructorId,
+        });
     }
 
     public async Task<CourseType> GetCourseByIdAsync(Guid id)
