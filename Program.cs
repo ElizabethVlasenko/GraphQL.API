@@ -15,7 +15,8 @@ builder.AddGraphQL()
     .AddSubscriptionType<Subscription>()
     .AddInMemorySubscriptions()
     .AddFiltering()
-    .AddSorting();
+    .AddSorting()
+    .AddProjections();
 
 string connectionString = builder.Configuration.GetConnectionString("default");
 builder.Services.AddPooledDbContextFactory<SchoolDBContext>(o => o.UseSqlite(connectionString));
